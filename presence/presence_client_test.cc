@@ -22,9 +22,13 @@ namespace nearby {
 namespace presence {
 namespace {
 
+using ::testing::status::StatusIs;
+
 TEST(PresenceClientTest, DefaultConstructorWorks) {
   PresenceClient presence_client;
-  presence_client.StartBroadcast({}, {}, {}, {});
+
+  EXPECT_THAT(presence_client.StartBroadcast({}, {}),
+              StatusIs(absl::StatusCode::kUnimplemented));
 }
 
 }  // namespace

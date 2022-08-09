@@ -16,14 +16,22 @@ licenses(["notice"])
 cc_library(
     name = "internal",
     srcs = [
+        "action_factory.cc",
         "advertisement_decoder.cc",
+        "advertisement_factory.cc",
+        "base_broadcast_request.cc",
         "credential_manager_impl.cc",
+        "encryption.cc",
     ],
     hdrs = [
+        "action_factory.h",
         "advertisement_decoder.h",
+        "advertisement_factory.h",
+        "base_broadcast_request.h",
         "broadcast_manager.h",
         "credential_manager.h",
         "credential_manager_impl.h",
+        "encryption.h",
         "mock_service_controller.h",
         "scan_manager.h",
         "service_controller.h",
@@ -37,19 +45,21 @@ cc_library(
         "//internal/platform:base",
         "//internal/platform:comm",
         "//internal/platform:logging",
+        "//internal/platform:uuid",
         "//internal/platform/implementation:comm",
         "//internal/platform/implementation:types",
-        "//presence:action_factory",
-        "//presence:advertisement_factory",
         "//presence:credential",
-        "//presence:encryption",
         "//presence:types",
         "//presence/implementation/mediums",
         "//presence/proto:credential_cc_proto",
+        "//third_party/tink/cc/subtle",
+        "@boringssl//:crypto",
         "@com_google_absl//absl/status",
         "@com_google_absl//absl/status:statusor",
         "@com_google_absl//absl/strings",
         "@com_google_absl//absl/strings:str_format",
+        "@com_google_absl//absl/types:optional",
+        "@com_google_absl//absl/types:variant",
     ],
 )
 
@@ -57,6 +67,60 @@ cc_test(
     name = "advertisement_decoder_test",
     size = "small",
     srcs = ["advertisement_decoder_test.cc"],
+    deps = [
+        ":internal",
+        "//internal/platform/implementation/g3",  # build_cleaner: keep
+        "//presence:types",
+        "@com_github_protobuf_matchers//protobuf-matchers",
+        "@com_google_absl//absl/strings",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "advertisement_factory_test",
+    size = "small",
+    srcs = ["advertisement_factory_test.cc"],
+    deps = [
+        ":internal",
+        "//internal/platform/implementation/g3",  # build_cleaner: keep
+        "//presence:types",
+        "@com_github_protobuf_matchers//protobuf-matchers",
+        "@com_google_absl//absl/status",
+        "@com_google_absl//absl/strings",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "encryption_test",
+    size = "small",
+    srcs = ["encryption_test.cc"],
+    deps = [
+        ":internal",
+        "//internal/platform/implementation/g3",  # build_cleaner: keep
+        "@com_github_protobuf_matchers//protobuf-matchers",
+        "@com_google_absl//absl/strings",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "base_broadcast_request_test",
+    srcs = ["base_broadcast_request_test.cc"],
+    deps = [
+        ":internal",
+        "//internal/platform/implementation/g3",  # build_cleaner: keep
+        "@com_github_protobuf_matchers//protobuf-matchers",
+        "@com_google_absl//absl/types:variant",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "action_factory_test",
+    size = "small",
+    srcs = ["action_factory_test.cc"],
     deps = [
         ":internal",
         "//internal/platform/implementation/g3",  # build_cleaner: keep
@@ -77,7 +141,6 @@ cc_test(
         "//internal/crypto",
         "//internal/platform/implementation:types",
         "//internal/platform/implementation/g3",  # build_cleaner: keep
-        "//presence:encryption",
         "@com_github_protobuf_matchers//protobuf-matchers",
         "@com_google_googletest//:gtest_main",
     ],

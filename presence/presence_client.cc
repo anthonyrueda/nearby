@@ -14,6 +14,8 @@
 
 #include "presence/presence_client.h"
 
+#include "absl/status/status.h"
+#include "absl/status/statusor.h"
 #include "presence/presence_device.h"
 
 namespace nearby {
@@ -33,17 +35,10 @@ std::vector<PresenceDevice> PresenceClient::GetCachedDevices(
   return std::vector<PresenceDevice>{};
 }
 
-void PresenceClient::StartBroadcast(const PresenceIdentity& identity,
-                                    const std::vector<PresenceAction>& actions,
-                                    const BroadcastOptions& options,
-                                    ResultCallback callback) {}
-
-void PresenceClient::UpdateBroadcastActions(
-    const PresenceIdentity& identity,
-    const std::vector<PresenceAction>& actions, ResultCallback callback) {}
-
-void PresenceClient::StopBroadcast(const PresenceIdentity& identity,
-                                   ResultCallback callback) {}
+absl::StatusOr<BroadcastSession> PresenceClient::StartBroadcast(
+    const BroadcastRequest& request, ResultCallback callback) {
+  return absl::UnimplementedError("StartBroadcast unimplemented");
+}
 
 }  // namespace presence
 }  // namespace nearby

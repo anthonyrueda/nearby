@@ -15,69 +15,45 @@
 #ifndef THIRD_PARTY_NEARBY_PRESENCE_BROADCAST_REQUEST_H_
 #define THIRD_PARTY_NEARBY_PRESENCE_BROADCAST_REQUEST_H_
 
-#include <stdint.h>
-
 #include <string>
-#include <variant>
+#include <vector>
 
-#include "absl/strings/string_view.h"
-#include "absl/types/variant.h"
+#include "absl/types/optional.h"
+#include "presence/data_element.h"
+#include "presence/power_mode.h"
 #include "presence/presence_identity.h"
 
 namespace nearby {
 namespace presence {
 
-constexpr int8_t kUnspecifiedTxPower = -128;
-
-/** Defines the action (intended actions) of base NP advertisement */
-struct Action {
-  uint16_t action;
-};
-
-/** Defines a Nearby Presence broadcast request */
+// Nearby Presence advertisement request options.
 struct BroadcastRequest {
-  struct BasePresence {
-    PresenceIdentity identity;
-    Action action;
-  };
-  struct BaseFastPair {
-    struct Discoverable {
-      std::string model_id;
-    };
-    struct Nondiscoverable {
-      std::string account_key_data;
-      std::string battery_info;
-    };
-    std::variant<Discoverable, Nondiscoverable> advertisement;
-  };
-  struct BaseEddystone {
-    std::string ephemeral_id;
-  };
-  std::variant<BasePresence, BaseFastPair, BaseEddystone> variant;
-  std::string salt;
-  int8_t tx_power;
-  unsigned int interval_ms;
-};
+  // Calibrated TX power. The broadcast recipient uses it to calculate the
+  // distance between both devices.
+  int tx_power;
 
-/** Builds a brodacast request variant with NP identity for BLE 4.2 */
-class BasePresenceRequestBuilder {
- public:
-  explicit BasePresenceRequestBuilder(const PresenceIdentity& identity)
-      : identity_(identity) {}
-  BasePresenceRequestBuilder& SetSalt(absl::string_view salt);
-  BasePresenceRequestBuilder& SetTxPower(int8_t tx_power);
-  BasePresenceRequestBuilder& SetAction(const Action& action);
+  // Account name used to select private credentials.
+  std::string account_name;
 
-  explicit operator BroadcastRequest() const;
+  // Presence identity type.
+  absl::optional<PresenceIdentity> identity;
 
- private:
-  PresenceIdentity identity_;
-  std::string salt_;
-  int8_t tx_power_ = kUnspecifiedTxPower;
-  Action action_;
+  // The broadcast frequency hint.
+  PowerMode power_mode;
+
+  // Additional Data Elements.
+  // The Presence SDK generates:
+  // - Salt,
+  // - (Private/Trusted/Public/Provisioned) Identity,
+  // - TX power,
+  // - Adverisement signature
+  // Data Elements when they are required in the advertisement. Other Data
+  // Elements are provided by the client application.
+  // Nearby SDK encrypts Data ELements before broadcasting if a non-public
+  // `PresenceIdentity` is provided.
+  std::vector<DataElement> extended_properties;
 };
 
 }  // namespace presence
 }  // namespace nearby
-
 #endif  // THIRD_PARTY_NEARBY_PRESENCE_BROADCAST_REQUEST_H_

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#include "presence/advertisement_factory.h"
+#include "presence/implementation/advertisement_factory.h"
 
 #include <string>
 #include <variant>
@@ -71,9 +71,10 @@ uint8_t GetIdentityFieldType(PresenceIdentity::IdentityType type) {
 }
 
 absl::StatusOr<BleAdvertisementData> AdvertisementFactory::CreateAdvertisement(
-    const BroadcastRequest& request) const {
+    const BaseBroadcastRequest& request) const {
   BleAdvertisementData advert = {};
-  if (std::holds_alternative<BroadcastRequest::BasePresence>(request.variant)) {
+  if (std::holds_alternative<BaseBroadcastRequest::BasePresence>(
+          request.variant)) {
     return CreateBaseNpAdvertisement(request);
   }
   return advert;
@@ -81,9 +82,9 @@ absl::StatusOr<BleAdvertisementData> AdvertisementFactory::CreateAdvertisement(
 
 absl::StatusOr<BleAdvertisementData>
 AdvertisementFactory::CreateBaseNpAdvertisement(
-    const BroadcastRequest& request) const {
+    const BaseBroadcastRequest& request) const {
   const auto& presence =
-      std::get<BroadcastRequest::BasePresence>(request.variant);
+      std::get<BaseBroadcastRequest::BasePresence>(request.variant);
   BleAdvertisementData advert{};
   std::string payload;
   payload.push_back(kBaseVersion);
@@ -96,7 +97,7 @@ AdvertisementFactory::CreateBaseNpAdvertisement(
     }
   }
   absl::StatusOr<std::string> identity =
-      certificate_manager_.GetBaseEncryptedMetadataKey(presence.identity);
+      credential_manager_.GetBaseEncryptedMetadataKey(presence.identity);
   if (!identity.ok()) {
     return identity.status();
   }
@@ -122,7 +123,7 @@ AdvertisementFactory::CreateBaseNpAdvertisement(
     return result;
   }
   if (!identity->empty()) {
-    auto encrypted = certificate_manager_.EncryptDataElements(
+    auto encrypted = credential_manager_.EncryptDataElements(
         presence.identity, request.salt, data_elements);
     if (!encrypted.ok()) {
       return encrypted.status();
