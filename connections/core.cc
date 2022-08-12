@@ -21,6 +21,7 @@
 
 #include "absl/time/clock.h"
 #include "connections/implementation/service_id_constants.h"
+#include "connections/listeners.h"
 #include "internal/platform/count_down_latch.h"
 #include "internal/platform/feature_flags.h"
 #include "internal/platform/logging.h"
@@ -168,9 +169,7 @@ void Core::StopAllEndpoints(ResultCallback callback) {
   router_->StopAllEndpoints(&client_, callback);
 }
 
-std::string Core::Dump() {
-  return client_.Dump();
-}
+std::string Core::Dump() { return client_.Dump(); }
 
 }  // namespace connections
 }  // namespace nearby

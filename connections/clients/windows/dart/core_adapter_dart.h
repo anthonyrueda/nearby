@@ -18,6 +18,7 @@
 #include "third_party/dart_lang/v2/runtime/include/dart_api_dl.h"
 #include "third_party/dart_lang/v2/runtime/include/dart_native_api.h"
 #include "connections/clients/windows/core_adapter.h"
+#include "internal/platform/byte_array.h"
 
 namespace location::nearby::windows {
 
@@ -58,6 +59,12 @@ struct AdvertisingOptionsDart {
   // Whether this is intended to be used in conjunction with InjectEndpoint().
   int64_t is_out_of_band_connection = false;
   const char *fast_advertisement_service_uuid;
+
+  // The information about this device (eg. name, device type),
+  // to appear on the remote device.
+  // Defined by client/application.
+  location::nearby::ByteArray device_info;
+
   Mediums mediums;
   // LINT.ThenChange(//depot/google3/location/nearby/apps/helloconnections/flutter/lib/advertising_options.dart)
 };
